@@ -1,11 +1,12 @@
 <?php
-
 namespace App\Models;
 
-use Stancl\Tenancy\Database\Models\Tenant as BaseTenant;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Stancl\Tenancy\Contracts\TenantWithDatabase;
 use Stancl\Tenancy\Database\Concerns\HasDatabase;
 use Stancl\Tenancy\Database\Concerns\HasDomains;
+use Stancl\Tenancy\Database\Models\Tenant as BaseTenant;
 
 class Tenant extends BaseTenant implements TenantWithDatabase
 {
@@ -13,15 +14,15 @@ class Tenant extends BaseTenant implements TenantWithDatabase
 
     const TYPE = [
         "SUBSCRIBER" => 1,
-        "TRIAL" => 2
+        "TRIAL"      => 2,
     ];
     const WEB_ACCESS = [
-        "ENABLED" => 1,
-        "DISABLED" => 0
+        "ENABLED"  => 1,
+        "DISABLED" => 0,
     ];
     const APP_ACCESS = [
-        "ENABLED" => 1,
-        "DISABLED" => 0
+        "ENABLED"  => 1,
+        "DISABLED" => 0,
     ];
     const TRIAL_DAYS = 28;
 
@@ -31,23 +32,24 @@ class Tenant extends BaseTenant implements TenantWithDatabase
 
     const SECRET = '9THT3FpioCSU7ZSC';
 
-    public function checkExpiry(){
-        $validTill = Carbon::parse($this->valid_till);
-        $currentDate = Carbon::now();
+    public function checkExpiry()
+    {
+        $validTill      = Carbon::parse($this->valid_till);
+        $currentDate    = Carbon::now();
         $daysDifference = $validTill->diffInDays($currentDate);
-        return in_array(($daysDifference+1), SELF::EXPIRE_REMINDER);
+        return in_array(($daysDifference + 1), SELF::EXPIRE_REMINDER);
     }
 
     public function configure()
     {
-        config(['database.connections.mysql.database' => $this->tenancy_db_name,]);
+        config(['database.connections.mysql.database' => $this->tenancy_db_name]);
         DB::purge('mysql');
         DB::reconnect('mysql');
         Schema::connection('mysql')->getConnection()->reconnect();
         return $this;
     }
 
-    public function use()
+    public function use ()
     {
         app()->forgetInstance('mysql');
         app()->instance('mysql', $this);
@@ -74,7 +76,7 @@ class Tenant extends BaseTenant implements TenantWithDatabase
             'tenant_contact_name',
             'tenant_contact_number',
             'final_activity_mail_sent',
-            'created_at'
+            'created_at',
         ];
     }
 

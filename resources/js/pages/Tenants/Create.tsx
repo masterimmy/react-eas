@@ -45,7 +45,8 @@ export default function Dashboard() {
         organization_valid_till: null as Date | null,
         organization_license_user_count: '',
         organization_timezone: '',
-        organiation_logo: '',
+        organization_logo: '' as File | string,
+        logo_preview: '' as string | null,
     })
 
     function submit(e: any) {
@@ -146,8 +147,8 @@ export default function Dashboard() {
                             <InputError message={errors.organization_license_user_count} className="mt-2" />
                         </div>
                         <div>
-                            <Label htmlFor="email">Base Timezone <span className="text-red-500">*</span></Label>
-                            <Select>
+                            <Label htmlFor="organization_timezone">Base Timezone <span className="text-red-500">*</span></Label>
+                            <Select onValueChange={(value) => setData('organization_timezone', value)}>
                                 <SelectTrigger className="w-full">
                                     <SelectValue placeholder="Select a timezone" />
                                 </SelectTrigger>
@@ -206,12 +207,42 @@ export default function Dashboard() {
                                     </SelectGroup>
                                 </SelectContent>
                             </Select>
-                            <InputError message={errors.username} className="mt-2" />
+                            <InputError message={errors.organization_timezone} className="mt-2" />
                         </div>
-                        <div>
-                            <Label htmlFor="email">Upload Comapny Logo <span className="text-red-500">*</span></Label>
-                            <Input type="file" id="email" value={data.organization_domain} onChange={e => setData('organization_domain', e.target.value)} required />
-                            <InputError message={errors.username} className="mt-2" />
+                        <div className="flex flex-col gap-4">
+                            <Label htmlFor="organization_logo">Upload Company Logo <span className="text-red-500">*</span></Label>
+                            <div className="flex items-start gap-4">
+                                <div className="flex-1">
+                                    <Input
+                                        type="file"
+                                        id="organization_logo"
+                                        accept="image/*"
+                                        onChange={e => {
+                                            const file = e.target.files?.[0];
+                                            if (file) {
+                                                setData('organization_logo', file);
+                                                // Create preview URL
+                                                const reader = new FileReader();
+                                                reader.onload = (e) => {
+                                                    setData('logo_preview', e.target?.result as string);
+                                                };
+                                                reader.readAsDataURL(file);
+                                            }
+                                        }}
+                                        required
+                                    />
+                                    <InputError message={errors.organization_logo} className="mt-2" />
+                                </div>
+                                {data.logo_preview && (
+                                    <div className="w-24 h-24 rounded-lg overflow-hidden border">
+                                        <img
+                                            src={data.logo_preview}
+                                            alt="Logo preview"
+                                            className="w-full h-full object-cover"
+                                        />
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
                     <div className="text-end">

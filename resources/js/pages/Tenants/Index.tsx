@@ -4,6 +4,7 @@ import { Head } from '@inertiajs/react';
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Link } from '@inertiajs/react';
+import { format } from 'date-fns';
 
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -13,7 +14,8 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function Dashboard() {
+export default function Dashboard({ tenants }: { tenants: { data: { id: number; tenant_name: string; tenancy_db_email: string; status: string; type: string; reseller: string; valid_from: string; valid_till: string; }[] } }) {
+
     const actionButton = (
         <Button asChild variant="outline" className="ml-auto">
             <Link href="/tenants/create">Add Tenant</Link>
@@ -43,12 +45,23 @@ export default function Dashboard() {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            <TableRow>
-                                <TableCell className="font-medium">INV001</TableCell>
-                                <TableCell>Paid</TableCell>
-                                <TableCell>Credit Card</TableCell>
-                                <TableCell className="text-right">$250.00</TableCell>
-                            </TableRow>
+                            {tenants.data.map((tenant) => (
+                                <TableRow key={tenant.id}>
+                                    <TableCell className="font-medium">{tenant.tenant_name}</TableCell>
+                                    <TableCell>{tenant.tenancy_db_email}</TableCell>
+                                    <TableCell>{tenant.status}</TableCell>
+                                    <TableCell>{tenant.type}</TableCell>
+                                    <TableCell>{tenant.reseller}</TableCell>
+                                    <TableCell>{format(new Date(tenant.valid_from), 'dd/MM/yyyy')}</TableCell>
+                                    <TableCell>{format(new Date(tenant.valid_till), 'dd/MM/yyyy')}</TableCell>
+                                    <TableCell>
+                                        <Button asChild variant="link" className="ml-auto">
+                                            <Link href={`/tenants/${tenant.id}/edit`}>Edit</Link>
+                                        </Button>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+
                         </TableBody>
                     </Table>
                 </div>
