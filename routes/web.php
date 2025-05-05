@@ -13,9 +13,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('dashboard');
 
     Route::resource('tenants', \App\Http\Controllers\TenantController::class)->names('tenants');
+    Route::get('support', [\App\Http\Controllers\SupportController::class, 'index'])->name('support.index');
 });
 
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';
-
-Route::resource('/tenants', App\Http\Controllers\TenantController::class);

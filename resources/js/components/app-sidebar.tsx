@@ -4,7 +4,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid, Users } from 'lucide-react';
+import { BookOpen, CircleUser, LayoutGrid, Users, Bug, Clipboard, RadioTower, ListRestart, Laptop } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -17,6 +17,31 @@ const mainNavItems: NavItem[] = [
         title: 'Tenants',
         href: '/tenants',
         icon: Users,
+    },
+    {
+        title: 'Support',
+        href: '/support',
+        icon: Bug,
+    },
+    {
+        title: 'Active User Report',
+        href: '/active-user-report',
+        icon: Clipboard,
+    },
+    {
+        title: 'Broadcast Announcement',
+        href: '/broadcast-announcement',
+        icon: RadioTower,
+    },
+    {
+        title: 'Reseller',
+        href: '/reseller',
+        icon: ListRestart,
+    },
+    {
+        title: 'Onboard Data',
+        href: '/onboard-data',
+        icon: Laptop,
     },
 ];
 

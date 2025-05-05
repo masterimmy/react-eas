@@ -1,74 +1,116 @@
+import { useState } from 'react';
 import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input"
 import InputError from "@/components/input-error";
 import { Label } from "@/components/ui/label"
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Head, useForm } from '@inertiajs/react';
+import { Head, useForm, Link, router } from '@inertiajs/react';
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import {
-    Select,
-    SelectContent,
-    SelectGroup,
-    SelectItem,
-    SelectLabel,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select"
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
+import { toast } from "sonner"
 
 
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Tenants',
-        href: '/tenants',
-    },
-    {
-        title: 'Create',
-        href: '/tenants/create',
-    },
-];
+export default function Create({ tenant }: { tenant: any }) {
 
-export default function Dashboard() {
+    const [open, setOpen] = useState(false);
 
-    const { data, setData, post, processing, errors, reset } = useForm({
-        organization_name: '',
-        organization_domain: '',
-        organization_user_name: '',
-        organization_user_mobile: '',
-        organization_user_email: '',
-        organization_valid_from: null as Date | null,
-        organization_valid_till: null as Date | null,
-        organization_license_user_count: '',
-        organization_timezone: '',
-        organization_logo: '' as File | string,
-        logo_preview: '' as string | null,
-    })
-
-    function submit(e: any) {
-        e.preventDefault()
-        post('/tenants', {
+    const handleDelete = () => {
+        router.delete(`/tenants/${tenant.id}`, {
             preserveScroll: true,
-        })
+            onSuccess: () => toast.success("Tenant has been deleted."),
+            onError: () => toast.error("Something went wrong."),
+        });
+    };
+
+    const actionButton = tenant?.id ? (
+        <>
+            <AlertDialog open={open} onOpenChange={setOpen}>
+                <AlertDialogTrigger asChild>
+                    <Button variant="destructive" className="ml-auto">
+                        Delete
+                    </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            This action cannot be undone. This will permanently delete the tenant
+                            and remove all associated data from our servers.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction 
+                            onClick={handleDelete}
+                            className="bg-destructive hover:bg-destructive/90"
+                        >
+                            Delete
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+        </>
+    ) : null;
+
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: 'Tenants',
+            href: '/tenants',
+        },
+        {
+            title: tenant?.id ? 'Edit' : 'Create',
+            href: tenant?.id ? `/tenants/${tenant.id}/edit` : '/tenants/create',
+        },
+    ];
+
+    const { data, setData, post, put, processing, errors } = useForm({
+        organization_name: tenant?.tenant_name || '',
+        organization_domain: tenant?.tenancy_db_name || '',
+        organization_user_name: tenant?.tenant_contact_name || '',
+        organization_user_mobile: tenant?.tenant_contact_number || '',
+        organization_user_email: tenant?.tenancy_db_email || '',
+        organization_valid_from: tenant?.valid_from ? new Date(tenant.valid_from) : null,
+        organization_valid_till: tenant?.valid_till ? new Date(tenant.valid_till) : null,
+        organization_license_user_count: tenant?.license_user_count || '',
+        organization_timezone: tenant?.base_timezone || '',
+        organization_logo: tenant?.organization_logo || '',
+        logo_preview: tenant?.tenant_logo || null,
+    });
+
+    function submit(e: React.FormEvent) {
+        e.preventDefault();
+        if (tenant?.id) {
+            put(`/tenants/${tenant.id}`, {
+                preserveScroll: true,
+                onSuccess: () => toast.success("Event has been created."),
+                onError: () => toast.error("Something went wrong."),
+            });
+        } else {
+            post('/tenants', {
+                preserveScroll: true,
+            });
+        }
     }
 
     return (
-        <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Tenants" />
+        <AppLayout breadcrumbs={breadcrumbs} actionButton={actionButton}>
+            <Head title={`${tenant?.id ? 'Edit' : 'Create'} Tenant`} />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <form onSubmit={submit} className="space-y-8">
                     <div className="grid auto-rows-min gap-4 md:grid-cols-3">
                         <div>
-                            <Label htmlFor="organization_name">Enter Organization Name <span className="text-red-500">*</span></Label>
-                            <Input type="text" id="organization_name" value={data.organization_name} onChange={e => setData('organization_name', e.target.value)} required />
+                            <Label htmlFor="tenant_name"> Organization Name <span className="text-red-500">*</span></Label>
+                            <Input type="text" id="tenant_name" value={data.organization_name} onChange={e => setData('organization_name', e.target.value)} required />
                             <InputError message={errors.organization_name} className="mt-2" />
                         </div>
                         <div>
-                            <Label htmlFor="organization_domain">Enter Domain Name <span className="text-red-500">*</span></Label>
+                            <Label htmlFor="organization_domain"> Domain Name <span className="text-red-500">*</span></Label>
                             <Input type="text" id="organization_domain" value={data.organization_domain} onChange={e => setData('organization_domain', e.target.value)} required />
                             <InputError message={errors.organization_domain} className="mt-2" />
                         </div>
@@ -78,12 +120,12 @@ export default function Dashboard() {
                             <InputError message={errors.organization_user_name} className="mt-2" />
                         </div>
                         <div>
-                            <Label htmlFor="organization_user_mobile">Enter User Contact <span className="text-red-500">*</span></Label>
+                            <Label htmlFor="organization_user_mobile"> User Contact <span className="text-red-500">*</span></Label>
                             <Input type="number" id="organization_user_mobile" value={data.organization_user_mobile} onChange={e => setData('organization_user_mobile', e.target.value)} required />
                             <InputError message={errors.organization_user_mobile} className="mt-2" />
                         </div>
                         <div>
-                            <Label htmlFor="organization_user_email">Enter User Email ID <span className="text-red-500">*</span></Label>
+                            <Label htmlFor="organization_user_email"> User Email ID <span className="text-red-500">*</span></Label>
                             <Input type="email" id="organization_user_email" value={data.organization_user_email} onChange={e => setData('organization_user_email', e.target.value)} required />
                             <InputError message={errors.organization_user_email} className="mt-2" />
                         </div>
@@ -210,7 +252,7 @@ export default function Dashboard() {
                             <InputError message={errors.organization_timezone} className="mt-2" />
                         </div>
                         <div className="flex flex-col gap-4">
-                            <Label htmlFor="organization_logo">Upload Company Logo <span className="text-red-500">*</span></Label>
+                            <Label htmlFor="organization_logo">Upload Company Logo </Label>
                             <div className="flex items-start gap-4">
                                 <div className="flex-1">
                                     <Input
@@ -229,7 +271,6 @@ export default function Dashboard() {
                                                 reader.readAsDataURL(file);
                                             }
                                         }}
-                                        required
                                     />
                                     <InputError message={errors.organization_logo} className="mt-2" />
                                 </div>
@@ -246,7 +287,9 @@ export default function Dashboard() {
                         </div>
                     </div>
                     <div className="text-end">
-                        <Button type="submit" disabled={processing}>Submit</Button>
+                        <Button type="submit" disabled={processing}>
+                            {tenant?.id ? 'Update' : 'Create'} Tenant
+                        </Button>
                     </div>
                 </form>
             </div>
