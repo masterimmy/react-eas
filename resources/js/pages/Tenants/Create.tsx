@@ -71,7 +71,7 @@ export default function Create({ tenant }: { tenant: any }) {
 
     const { data, setData, post, put, processing, errors } = useForm({
         organization_name: tenant?.tenant_name || '',
-        organization_domain: tenant?.tenancy_db_name || '',
+        organization_domain: tenant?.id || '',
         organization_user_name: tenant?.tenant_contact_name || '',
         organization_user_mobile: tenant?.tenant_contact_number || '',
         organization_user_email: tenant?.tenancy_db_email || '',

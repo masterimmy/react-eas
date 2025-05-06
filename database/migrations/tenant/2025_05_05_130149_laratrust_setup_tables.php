@@ -25,9 +25,11 @@ class LaratrustSetupTables extends Migration
         // Create table for storing permissions
         Schema::create('permissions', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('name')->unique();
+            $table->string('name');
             $table->string('display_name')->nullable();
             $table->string('description')->nullable();
+            $table->string('access_to')->nullable();
+            $table->string('module_id')->nullable();
             $table->timestamps();
         });
 
