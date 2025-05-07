@@ -14,27 +14,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
-    Route::get('/table-data/{table}', function (Request $request, string $table) {
-        try {
-            $valueColumn = $request->query('value', 'id');
-            $labelColumn = $request->query('label', 'name');
-            
-            $data = DB::table($table)
-                ->select($valueColumn, $labelColumn)
-                ->limit(10)
-                ->get()
-                ->map(function($item) use ($valueColumn, $labelColumn) {
-                    return [
-                        'value' => $item->{$valueColumn},
-                        'label' => $item->{$labelColumn}
-                    ];
-                });
-                
-            return response()->json($data);
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'Error fetching data'], 404);
-        }
-    });
 
     Route::resource('tenants', \App\Http\Controllers\TenantController::class)->names('tenants');
     Route::get('support', [\App\Http\Controllers\SupportController::class, 'index'])->name('support.index');

@@ -16,11 +16,18 @@ class UserController extends Controller
 {
     public function create(Request $request): Response
     {
-
-        // dd(User::all());
         return Inertia::render('Clients/auth/login', [
             'canResetPassword' => Route::has('password.request'),
             'status' => $request->session()->get('status'),
         ]);
+    }
+
+    public function store(LoginRequest $request): RedirectResponse
+    {
+        $request->authenticate();
+
+        $request->session()->regenerate();
+
+        return redirect()->intended(route('client_dashboard', absolute: false));
     }
 }

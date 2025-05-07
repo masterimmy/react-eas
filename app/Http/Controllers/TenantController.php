@@ -14,7 +14,8 @@ class TenantController extends Controller
 {
     public function index()
     {
-        $tenants = Tenant::select('id', 'tenant_name','tenancy_db_email','valid_from', 'valid_till')->latest()->paginate(10);
+        $tenants = Tenant::select('id', 'tenant_name', 'tenancy_db_email', 'valid_from', 'valid_till')
+        ->latest()->paginate(10);
         return Inertia::render('Tenants/Index', [
             'tenants' => $tenants,
         ]);
@@ -32,7 +33,7 @@ class TenantController extends Controller
 
             return DB::transaction(function () use ($request, $logoFile) {
                 // Process file inside the transaction
-                $filepath = base64_encode(file_get_contents($logoFile->path()));
+                $filepath = $logoFile->store('tenant-logos', 'public');
 
                 // Create tenant
                 $tenant = Tenant::create([

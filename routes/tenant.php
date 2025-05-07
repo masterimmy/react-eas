@@ -15,6 +15,7 @@ Route::middleware([
     
     Route::get('/', function () {return redirect()->route('client_login');});
     Route::get('/login', [\App\Http\Controllers\UserController::class, 'create'])->middleware('guest')->name('client_login');
+    Route::post('/login', [\App\Http\Controllers\UserController::class, 'store'])->middleware('guest')->name('client_login_post');
 
     // Route::get('/', function () {
     //     redirect()->route('login');

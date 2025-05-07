@@ -46,7 +46,7 @@ export default function Create({ tenant }: { tenant: any }) {
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction 
+                        <AlertDialogAction
                             onClick={handleDelete}
                             className="bg-destructive hover:bg-destructive/90"
                         >
@@ -79,7 +79,7 @@ export default function Create({ tenant }: { tenant: any }) {
         organization_valid_till: tenant?.valid_till ? new Date(tenant.valid_till) : null,
         organization_license_user_count: tenant?.license_user_count || '',
         organization_timezone: tenant?.base_timezone || '',
-        organization_logo: tenant?.organization_logo || '',
+        organization_logo: null as File | null,
         logo_preview: tenant?.tenant_logo || null,
     });
 
@@ -251,40 +251,37 @@ export default function Create({ tenant }: { tenant: any }) {
                             </Select>
                             <InputError message={errors.organization_timezone} className="mt-2" />
                         </div>
-                        <div className="flex flex-col gap-4">
-                            <Label htmlFor="organization_logo">Upload Company Logo </Label>
-                            <div className="flex items-start gap-4">
-                                <div className="flex-1">
-                                    <Input
-                                        type="file"
-                                        id="organization_logo"
-                                        accept="image/*"
-                                        onChange={e => {
-                                            const file = e.target.files?.[0];
-                                            if (file) {
-                                                setData('organization_logo', file);
-                                                // Create preview URL
-                                                const reader = new FileReader();
-                                                reader.onload = (e) => {
-                                                    setData('logo_preview', e.target?.result as string);
-                                                };
-                                                reader.readAsDataURL(file);
-                                            }
-                                        }}
-                                    />
-                                    <InputError message={errors.organization_logo} className="mt-2" />
-                                </div>
-                                {data.logo_preview && (
-                                    <div className="w-24 h-24 rounded-lg overflow-hidden border">
-                                        <img
-                                            src={data.logo_preview}
-                                            alt="Logo preview"
-                                            className="w-full h-full object-cover"
-                                        />
-                                    </div>
-                                )}
+                        <div className="flex items-start gap-4">
+                            <div className="flex-1">
+                                <Label htmlFor="organization_logo">Upload Company Logo </Label>
+                                <Input
+                                    type="file"
+                                    id="organization_logo"
+                                    accept="image/*"
+                                    onChange={e => {
+                                        const file = e.target.files?.[0];
+                                        if (file) {
+                                            setData('organization_logo', file);
+                                            const reader = new FileReader();
+                                            reader.onload = (e) => {
+                                                setData('logo_preview', e.target?.result as string);
+                                            };
+                                            reader.readAsDataURL(file);
+                                        }
+                                    }}
+                                />
+                                <InputError message={errors.organization_logo} className="mt-2" />
                             </div>
                         </div>
+                        {data.logo_preview && (
+                            <div className="w-24 h-24 rounded-lg overflow-hidden border">
+                                <img
+                                    src={data.logo_preview.startsWith('data:') ? data.logo_preview : `/storage/${data.logo_preview}`}
+                                    alt="Logo preview"
+                                    className="w-full h-full object-cover"
+                                />
+                            </div>
+                        )}
                     </div>
                     <div className="text-end">
                         <Button type="submit" disabled={processing}>
