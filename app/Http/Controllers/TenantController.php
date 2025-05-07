@@ -14,8 +14,7 @@ class TenantController extends Controller
 {
     public function index()
     {
-        $tenants = Tenant::latest()->paginate(10);
-
+        $tenants = Tenant::select('id', 'tenant_name','tenancy_db_email','valid_from', 'valid_till')->latest()->paginate(10);
         return Inertia::render('Tenants/Index', [
             'tenants' => $tenants,
         ]);

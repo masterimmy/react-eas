@@ -5,6 +5,7 @@ import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, Tabl
 import { Button } from "@/components/ui/button";
 import { format } from 'date-fns';
 import { toast } from "sonner"
+import { getTenantUrl } from '@/lib/utils';
 
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -35,10 +36,11 @@ export default function Dashboard({ tenants }: { tenants: { data: { id: number; 
                         <TableHeader>
                             <TableRow>
                                 <TableHead>Tenant Name</TableHead>
+                                <TableHead>Domain</TableHead>
                                 <TableHead>Email</TableHead>
-                                <TableHead>Status</TableHead>
+                                {/* <TableHead>Status</TableHead>
                                 <TableHead>Type</TableHead>
-                                <TableHead>Reseller</TableHead>
+                                <TableHead>Reseller</TableHead> */}
                                 <TableHead>Valid From</TableHead>
                                 <TableHead>Valid Till</TableHead>
                                 <TableHead>Action</TableHead>
@@ -48,10 +50,15 @@ export default function Dashboard({ tenants }: { tenants: { data: { id: number; 
                             {tenants.data.map((tenant) => (
                                 <TableRow key={tenant.id}>
                                     <TableCell className="font-medium">{tenant.tenant_name}</TableCell>
+                                    <TableCell>
+                                        <a href={getTenantUrl(tenant.id)} target="_blank" className="text-blue-600 hover:underline">
+                                            {tenant.id}
+                                        </a>
+                                    </TableCell>
                                     <TableCell>{tenant.tenancy_db_email}</TableCell>
-                                    <TableCell>{tenant.status}</TableCell>
+                                    {/* <TableCell>{tenant.status}</TableCell>
                                     <TableCell>{tenant.type}</TableCell>
-                                    <TableCell>{tenant.reseller}</TableCell>
+                                    <TableCell>{tenant.reseller}</TableCell> */}
                                     <TableCell>{format(new Date(tenant.valid_from), 'dd/MM/yyyy')}</TableCell>
                                     <TableCell>{format(new Date(tenant.valid_till), 'dd/MM/yyyy')}</TableCell>
                                     <TableCell>
